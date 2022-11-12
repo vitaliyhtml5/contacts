@@ -1,0 +1,199 @@
+{
+	"info": {
+		"_postman_id": "393acb85-8170-4cac-86bd-474952cca657",
+		"name": "Contacts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/login.php",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"login.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Session",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/session.php",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"session.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get contacts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/get_contacts.php?page=1&page_size=20&category=work,friends,home,other&search=smith&sort=name",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"get_contacts.php"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "page_size",
+							"value": "20"
+						},
+						{
+							"key": "category",
+							"value": "work,friends,home,other"
+						},
+						{
+							"key": "search",
+							"value": "smith"
+						},
+						{
+							"key": "sort",
+							"value": "name"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add contact",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Adam\",\n    \"email\": \"adam@mail.com\",\n    \"category\": \"other\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/add_contact.php",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"add_contact.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit contact",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"c64abac6-62c1-11ed-9813-0019d2e2f90a\",\n    \"name\": \"Alan White\",\n    \"email\": \"alan.white@mail.com\",\n    \"category\": \"other\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/edit_contact.php",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"edit_contact.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove contact",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"cc9eacdf-62af-11ed-9813-0019d2e2f90a\",\n    \"name\": \"Aaaadam2\",\n    \"email\": \"aaadam2@mail.com\",\n    \"category\": \"other\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/remove_contact.php?id=c64abac6-62c1-11ed-9813-0019d2e2f90a",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"remove_contact.php"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "c64abac6-62c1-11ed-9813-0019d2e2f90a"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/logout.php",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"logout.php"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
