@@ -1,0 +1,5 @@
+1. Install package: npm i -g newman
+2. Upload "Postman tests" collection from Postman
+3. Upload env variables
+4. Run tests: 
+newman run "Postman tests.postman_collection.json" --delay-request 1000 --environment "Contacts.postman_environment.json"

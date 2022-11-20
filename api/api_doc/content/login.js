@@ -2,7 +2,7 @@ const showLogin = () => `
 <div>
     <h2>Login</h2>
     <i class="task-desc">Log in account</i>
-    <div class="method"><span class="method-post">POST</span><b>/api/session.php</b></div>
+    <div class="method"><span class="method-post">POST</span><b>/api/login.php</b></div>
     <div class="desc-block desc-block-header">
         <h3>Headers:</h3>
         <p>Content-Type: application/json</p>

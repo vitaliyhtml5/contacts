@@ -3,7 +3,7 @@ const showContacts = () => `
     <h2>Get contacts</h2>
     <i class="task-desc">Get all contacts</i>
     <div class="method">
-        <span class="method-get">GET</span><b>/api/get_profile.php</b>
+        <span class="method-get">GET</span><b>/api/get_contacts.php</b>
     </div>
     <div class="desc-block">
         <h3>Parameters:</h3>

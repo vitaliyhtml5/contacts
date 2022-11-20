@@ -1,0 +1,1651 @@
+{
+	"info": {
+		"_postman_id": "27434104-2943-409d-a557-9a2df0484ee3",
+		"name": "Postman tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Session",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkMessage = (testName, message) => pm.test(testName, () => pm.expect(res.error).to.eql(message));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about empty email', \"email can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about empty password', \"password can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about max length of email', 'max length of email is 20 chars');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 3) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about max length of password', 'max length of password is 20 chars');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 4) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about invalid email', 'email is invalid');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 5) {",
+									"    checkStatus(401);",
+									"    checkMessage('Error message about incorrect credentials', 'Incorrect credentials');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 6) {",
+									"    checkStatus(201);",
+									"    pm.test('Jwt is available', () => pm.expect(res.access.jwt).to.not.empty);",
+									"    pm.test('Cookies are created', () => pm.expect(pm.cookies.has('contacts_token')).to.be.true);",
+									"    pm.variables.unset('iteration');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Login');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const testData = [",
+									"    {email: '', password: '1'},",
+									"    {email: 'test@test.com', password: ''},",
+									"    {email: 'test12345678@test.com', password: '1'},",
+									"    {email: 'test@test.com', password: '123456789012345678901'},",
+									"    {email: 'incorrecttest.com', password: '1'},",
+									"    {email: 'test@test.com', password: 'incorrect'},",
+									"    {email: 'test@test.com', password: '1'},",
+									"];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"    const cookieJar = pm.cookies.jar();",
+									"    cookieJar.unset(pm.environment.get('env'), 'contacts_token', (err) => console.log(err));",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"pm.variables.set('email', testData[counter].email);",
+									"pm.variables.set('password', testData[counter].password);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/login.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"login.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(204);",
+									"    pm.test('Cookies are removed', () => pm.expect(pm.cookies.has('contacts_token')).to.be.false);",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(401);",
+									"    pm.test('Error status about unauthorized user', () => pm.expect(pm.response.json().error).to.eql('Authentication failed'));",
+									"    pm.variables.unset('iteration');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Logout');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"if (!pm.variables.get('iteration')) { ",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const email = pm.environment.get('email');",
+									"    const password = pm.environment.get('password');",
+									"",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/login.php`,",
+									"        method: 'POST',",
+									"        header: 'Content-type: application/json',",
+									"        body: JSON.stringify({email,password})",
+									"    });    ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/logout.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"logout.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(204);",
+									"    logout();",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(401);",
+									"    pm.test('Error status about unauthorized user', () => pm.expect(pm.response.json().error).to.eql('Authentication failed'));",
+									"    pm.variables.unset('iteration');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Session');",
+									"}",
+									"",
+									"function logout() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/logout.php`,",
+									"        method: 'DELETE'",
+									"    });   ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"if (!pm.variables.get('iteration')) { ",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const email = pm.environment.get('email');",
+									"    const password = pm.environment.get('password');",
+									"",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/login.php`,",
+									"        method: 'POST',",
+									"        header: 'Content-type: application/json',",
+									"        body: JSON.stringify({email,password})",
+									"    });    ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/session.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"session.php"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Get contacts",
+			"item": [
+				{
+					"name": "Get by category",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const categoryArr = ['incorrect-category', 'home', 'friends', 'work', 'other'];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"pm.variables.set('category', categoryArr[counter]);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkEqual = (arr, param) => arr.every(item => item === param);",
+									"const category = pm.variables.get('category');",
+									"let categoryRes;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(200);",
+									"    pm.test('Get \"No results found\" message', () => pm.expect(res.data).to.eql('No results found'));",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(200);",
+									"    categoryRes = res.data.map(item => item.category);",
+									"    checkCategory(categoryRes);",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"    checkStatus(200);",
+									"    categoryRes = res.data.map(item => item.category);",
+									"    checkCategory(categoryRes);",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 3) {",
+									"    checkStatus(200);",
+									"    categoryRes = res.data.map(item => item.category);",
+									"    checkCategory(categoryRes);",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 4) {",
+									"    checkStatus(200);",
+									"    categoryRes = res.data.map(item => item.category);",
+									"    checkCategory(categoryRes);",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('category');",
+									"}",
+									"",
+									"function checkCategory(arr) {",
+									"    pm.test(`Filter ${category} category`, () => pm.expect(checkEqual(arr, category)).to.be.true);",
+									"}",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    categoryRes = [];",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Get by category');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/get_contacts.php?category={{category}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"get_contacts.php"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "{{category}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get by search",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let searchVal;",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    pm.variables.set('search', 'incorrect-search');",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"    getData(counter);",
+									"}",
+									"",
+									"function getData(counter) {",
+									"    const random = arr => arr[Math.floor(Math.random()*arr.length)];",
+									"    const url = pm.environment.get('baseUrl');",
+									"    let itemArr = [];",
+									"",
+									"    pm.sendRequest(`${url}/api/get_contacts.php`, (err, res) => {",
+									"        if (counter === 1) {",
+									"            itemArr = res.json().data.map(item => item.name);",
+									"        } else if (counter === 2) {",
+									"            itemArr = res.json().data.map(item => item.email);",
+									"        }",
+									"        searchVal = random(itemArr);",
+									"        pm.variables.set('search', searchVal);",
+									"    }); ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const searchParam = pm.variables.get('search');",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkEqual = arr => arr.every(item => item.includes(searchParam));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(200);",
+									"    pm.test('Get \"No results found\" message', () => pm.expect(res.data).to.eql('No results found'));",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(200);",
+									"    checkSearch('name');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"    checkStatus(200);",
+									"    checkSearch('email');",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('search');",
+									"}",
+									"",
+									"function checkSearch(type) {",
+									"    let itemArr = [];",
+									"    if (type === 'name') {",
+									"        itemArr = res.data.map(item => item.name);",
+									"    } else if (type === 'email') {",
+									"        itemArr = res.data.map(item => item.email);",
+									"    }",
+									"    pm.test(`Search by ${type}`, () => pm.expect(checkEqual(itemArr)).to.be.true);",
+									"}",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Get by search');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/get_contacts.php?search={{search}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"get_contacts.php"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "{{search}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get by sort",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const sortArr = ['name', '-name', 'email', '-email'];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"pm.variables.set('sort', sortArr[counter]);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(200);",
+									"    checkSort('name', 'ASC');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(200);",
+									"    checkSort('name', 'DESC');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"    checkStatus(200);",
+									"    checkSort('email', 'ASC');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 3) {",
+									"    checkStatus(200);",
+									"    checkSort('email', 'DESC');",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('sort');",
+									"}",
+									"",
+									"function checkSort(type, order) {",
+									"    let itemArr = [];",
+									"",
+									"    if (type === 'name') {",
+									"        itemArr = res.data.map(item => item.name);",
+									"    } else if (type === 'email') {",
+									"        itemArr = res.data.map(item => item.email);",
+									"    }",
+									"",
+									"    pm.test(`Sort by ${type} in ${order} order`, () => pm.expect(checkOrder(itemArr, order)).to.be.true);",
+									"}",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Get by sort');",
+									"}",
+									"",
+									"function checkOrder(itemArr, sortOrder) {",
+									"    let sorted = true;",
+									"    for (let i = 0; i < itemArr.length; i++) {",
+									"        if (sortOrder === 'ASC' && itemArr[i] > itemArr[i+1]) {",
+									"            sorted = false;",
+									"            break;",
+									"        } else if (sortOrder === 'DESC' && itemArr[i] < itemArr[i+1]) {",
+									"            sorted = false;",
+									"            break;",
+									"        }",
+									"    }",
+									"    return sorted;",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/get_contacts.php?sort={{sort}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"get_contacts.php"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "{{sort}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permission",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Status code is 401`, () => pm.response.to.have.status(401));",
+									"pm.test('Error status about unauthorized user', () => pm.expect(pm.response.json().error).to.eql('Authentication failed'));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const url = pm.environment.get('baseUrl');",
+									"pm.sendRequest({",
+									"    url: `${url}/api/logout.php`,",
+									"    method: 'DELETE'",
+									"});   "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/get_contacts.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"get_contacts.php"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const url = pm.environment.get('baseUrl');",
+							"const email = pm.environment.get('email');",
+							"const password = pm.environment.get('password');",
+							"",
+							"pm.sendRequest({",
+							"    url: `${url}/api/login.php`,",
+							"    method: 'POST',",
+							"    header: 'Content-type: application/json',",
+							"    body: JSON.stringify({email,password})",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Add contact",
+			"item": [
+				{
+					"name": "Add new contact",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkMessage = (testName, message) => pm.test(testName, () => pm.expect(res.error).to.eql(message));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about empty name', \"name can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"     checkStatus(422);",
+									"    checkMessage('Error message about empty email', \"email can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"     checkStatus(422);",
+									"    checkMessage('Error message about empty category', \"category can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 3) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about max length of name', 'max length of name is 20 chars');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 4) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about max length of email', 'max length of email is 20 chars');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 5) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about invalid email', 'email is invalid');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 6) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about incorrect category', 'incorrect category');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 7) {",
+									"    checkStatus(201);",
+									"    pm.test('Message about adding contact', () => pm.expect(res.message).to.eql('Contact has been added'));",
+									"    findContact();",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('name');",
+									"    pm.variables.unset('email');",
+									"    pm.variables.unset('category');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Add new contact');",
+									"}",
+									"",
+									"//Postcondition",
+									"function findContact() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const userEmail = pm.variables.get('email');",
+									"",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/get_contacts.php?search=${userEmail}`,",
+									"        method: 'GET'",
+									"    }, (err, res) => {",
+									"        removeContact(url, res.json().data[0].id);",
+									"    }); ",
+									"}",
+									"function removeContact(url, userId) {",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/remove_contact.php?id=${userId}`,",
+									"        method: 'DELETE'",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const testData = [",
+									"    {name: '', email: 'newtest@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: '', category: 'other'},",
+									"    {name: 'Testname contact', email: 'newtest@test.com', category: ''},",
+									"    {name: '123456789012345678901', email: 'newtest@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: 'test12345678@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: 'incorr ect@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: 'newtest@test.com', category: 'incorrect'},",
+									"    {name: 'Testname contact', email: 'newtest@test.com', category: 'other'},",
+									"];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"pm.variables.set('name', testData[counter].name);",
+									"pm.variables.set('email', testData[counter].email);",
+									"pm.variables.set('category', testData[counter].category);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\",\n    \"email\": \"{{email}}\",\n    \"category\": \"{{category}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/add_contact.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"add_contact.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add correct category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkMessage = (testName, message) => pm.test(testName, () => pm.expect(res.error).to.eql(message));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(201);",
+									"    pm.test('Message about adding contact', () => pm.expect(res.message).to.eql('Contact has been added'));",
+									"    findContact();",
+									"    increaseIteration()",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(201);",
+									"    pm.test('Message about adding contact', () => pm.expect(res.message).to.eql('Contact has been added'));",
+									"    findContact();",
+									"    increaseIteration()",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"    checkStatus(201);",
+									"    pm.test('Message about adding contact', () => pm.expect(res.message).to.eql('Contact has been added'));",
+									"    findContact();",
+									"    increaseIteration()",
+									"} else if (pm.variables.get('iteration') === 3) {",
+									"    checkStatus(201);",
+									"    pm.test('Message about adding contact', () => pm.expect(res.message).to.eql('Contact has been added'));",
+									"    findContact();",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('name');",
+									"    pm.variables.unset('email');",
+									"    pm.variables.unset('category');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Add correct category');",
+									"}",
+									"",
+									"//Postcondition",
+									"function findContact() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const userEmail = pm.variables.get('email');",
+									"",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/get_contacts.php?search=${userEmail}`,",
+									"        method: 'GET'",
+									"    }, (err, res) => {",
+									"        removeContact(url, res.json().data[0].id);",
+									"    }); ",
+									"}",
+									"function removeContact(url, userId) {",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/remove_contact.php?id=${userId}`,",
+									"        method: 'DELETE'",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const category = ['home', 'friends', 'work', 'other'];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"    pm.variables.set('name', 'Testname contact');",
+									"    pm.variables.set('email', 'newtest@test.com');",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"pm.variables.set('category', category[counter]);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\",\n    \"email\": \"{{email}}\",\n    \"category\": \"{{category}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/add_contact.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"add_contact.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permission",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Status code is 401`, () => pm.response.to.have.status(401));",
+									"pm.test('Error status about unauthorized user', () => pm.expect(pm.response.json().error).to.eql('Authentication failed'));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const url = pm.environment.get('baseUrl');",
+									"pm.sendRequest({",
+									"    url: `${url}/api/logout.php`,",
+									"    method: 'DELETE'",
+									"});   ",
+									"",
+									"pm.variables.set('name', 'Testname contact');",
+									"pm.variables.set('email', 'newtest@test.com');",
+									"pm.variables.set('category', 'other');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{name}}\",\n    \"email\": \"{{email}}\",\n    \"category\": \"{{category}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/add_contact.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"add_contact.php"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const url = pm.environment.get('baseUrl');",
+							"const email = pm.environment.get('email');",
+							"const password = pm.environment.get('password');",
+							"",
+							"pm.sendRequest({",
+							"    url: `${url}/api/login.php`,",
+							"    method: 'POST',",
+							"    header: 'Content-type: application/json',",
+							"    body: JSON.stringify({email,password})",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Edit contact",
+			"item": [
+				{
+					"name": "Edit contact",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkMessage = (testName, message) => pm.test(testName, () => pm.expect(res.error).to.eql(message));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(404);",
+									"    checkMessage('Error message about incorrect id', \"User doesn't exist\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about empty name', \"name can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"     checkStatus(422);",
+									"    checkMessage('Error message about empty email', \"email can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 3) {",
+									"     checkStatus(422);",
+									"    checkMessage('Error message about empty category', \"category can't be empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 4) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about max length of name', 'max length of name is 20 chars');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 5) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about max length of email', 'max length of email is 20 chars');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 6) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about invalid email', 'email is invalid');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 7) {",
+									"    checkStatus(422);",
+									"    checkMessage('Error message about incorrect category', 'incorrect category');",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 8) {",
+									"    checkStatus(200);",
+									"    pm.test('Message about editing contact', () => pm.expect(res.message).to.eql('Contact has been updated'));",
+									"    removeContact();",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('id');",
+									"    pm.variables.unset('name');",
+									"    pm.variables.unset('email');",
+									"    pm.variables.unset('category');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Edit contact');",
+									"}",
+									"",
+									"//Postcondition",
+									"function removeContact() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const userId = pm.variables.get('id');",
+									"    ",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/remove_contact.php?id=${userId}`,",
+									"        method: 'DELETE'",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const testData = [",
+									"    {name: 'Testname contact', email: 'newtest@test.com', category: 'other'},",
+									"    {name: '', email: 'newtest@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: '', category: 'other'},",
+									"    {name: 'Testname contact', email: 'newtest@test.com', category: ''},",
+									"    {name: '123456789012345678901', email: 'newtest@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: 'test12345678@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: 'incorr ect@test.com', category: 'other'},",
+									"    {name: 'Testname contact', email: 'newtest@test.com', category: 'incorrect'},",
+									"    {name: 'Testname contact', email: 'newtest@test.com', category: 'other'},",
+									"];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"    pm.variables.set('id', 'incorrrect-id');",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"if (counter === 1) {",
+									"    createUser();",
+									"}",
+									"",
+									"pm.variables.set('name', testData[counter].name);",
+									"pm.variables.set('email', testData[counter].email);",
+									"pm.variables.set('category', testData[counter].category);",
+									"",
+									"function createUser() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const userData = {name: 'Testname contact', email: 'newtest@test.com', category: 'other'};",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/add_contact.php`,",
+									"        method: 'POST',",
+									"        header: 'Content-type: application/json',",
+									"        body: JSON.stringify(userData)",
+									"    }, (err, res) => {",
+									"        getId(url, userData.email);",
+									"    }); ",
+									"}",
+									"",
+									"function getId(url, userEmail) {",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/get_contacts.php?search=${userEmail}`,",
+									"        method: 'GET'",
+									"    }, (err, res) => {",
+									"        pm.variables.set('id', res.json().data[0].id);",
+									"    }); ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{id}}\",\n    \"name\": \"{{name}}\",\n    \"email\": \"{{email}}\",\n    \"category\": \"{{category}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/edit_contact.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"edit_contact.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit with correct category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkMessage = (testName, message) => pm.test(testName, () => pm.expect(res.error).to.eql(message));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(200);",
+									"    pm.test('Message about editing contact', () => pm.expect(res.message).to.eql('Contact has been updated'));",
+									"    increaseIteration()",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"   checkStatus(200);",
+									"    pm.test('Message about editing contact', () => pm.expect(res.message).to.eql('Contact has been updated'));",
+									"    increaseIteration()",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"    checkStatus(200);",
+									"    pm.test('Message about editing contact', () => pm.expect(res.message).to.eql('Contact has been updated'));",
+									"    increaseIteration()",
+									"} else if (pm.variables.get('iteration') === 3) {",
+									"    checkStatus(200);",
+									"    pm.test('Message about editing contact', () => pm.expect(res.message).to.eql('Contact has been updated'));",
+									"    removeContact();",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('id');",
+									"    pm.variables.unset('name');",
+									"    pm.variables.unset('email');",
+									"    pm.variables.unset('category');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Edit with correct category');",
+									"}",
+									"",
+									"//Postcondition",
+									"function removeContact() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const userId = pm.variables.get('id');",
+									"    ",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/remove_contact.php?id=${userId}`,",
+									"        method: 'DELETE'",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const category = ['home', 'friends', 'work', 'other'];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"    pm.variables.set('name', 'Testname contact');",
+									"    pm.variables.set('email', 'newtest@test.com');",
+									"    createUser();",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"pm.variables.set('category', category[counter]);",
+									"",
+									"function createUser() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const userData = {name: 'Testname contact', email: 'newtest@test.com', category: 'other'};",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/add_contact.php`,",
+									"        method: 'POST',",
+									"        header: 'Content-type: application/json',",
+									"        body: JSON.stringify(userData)",
+									"    }, (err, res) => {",
+									"        getId(url, userData.email);",
+									"    }); ",
+									"}",
+									"",
+									"function getId(url, userEmail) {",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/get_contacts.php?search=${userEmail}`,",
+									"        method: 'GET'",
+									"    }, (err, res) => {",
+									"        pm.variables.set('id', res.json().data[0].id);",
+									"    }); ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{id}}\",\n    \"name\": \"{{name}}\",\n    \"email\": \"{{email}}\",\n    \"category\": \"{{category}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/edit_contact.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"edit_contact.php"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permission",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Status code is 401`, () => pm.response.to.have.status(401));",
+									"pm.test('Error status about unauthorized user', () => pm.expect(pm.response.json().error).to.eql('Authentication failed'));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const url = pm.environment.get('baseUrl');",
+									"pm.sendRequest({",
+									"    url: `${url}/api/logout.php`,",
+									"    method: 'DELETE'",
+									"});   ",
+									"",
+									"pm.variables.set('id', 'ccdd0e46-68f1-11ed-898d-0019d2e2f90a');",
+									"pm.variables.set('name', 'Testname contact');",
+									"pm.variables.set('email', 'newtest@test.com');",
+									"pm.variables.set('category', 'other');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{id}}\",\n    \"name\": \"{{name}}\",\n    \"email\": \"{{email}}\",\n    \"category\": \"{{category}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/edit_contact.php",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"edit_contact.php"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const url = pm.environment.get('baseUrl');",
+							"const email = pm.environment.get('email');",
+							"const password = pm.environment.get('password');",
+							"",
+							"pm.sendRequest({",
+							"    url: `${url}/api/login.php`,",
+							"    method: 'POST',",
+							"    header: 'Content-type: application/json',",
+							"    body: JSON.stringify({email,password})",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Remove contact",
+			"item": [
+				{
+					"name": "Remove contact",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const idArr = ['', 'incorrrect-id'];",
+									"let counter;",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    counter = 0;",
+									"} else {",
+									"    counter = pm.variables.get('iteration');",
+									"}",
+									"",
+									"(counter !== 2) ? pm.variables.set('id', idArr[counter]) : createUser();",
+									"",
+									"function createUser() {",
+									"    const url = pm.environment.get('baseUrl');",
+									"    const userData = {name: 'Testname contact', email: 'newtest@test.com', category: 'other'};",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/add_contact.php`,",
+									"        method: 'POST',",
+									"        header: 'Content-type: application/json',",
+									"        body: JSON.stringify(userData)",
+									"    }, (err, res) => {",
+									"        getId(url, userData.email);",
+									"    }); ",
+									"}",
+									"",
+									"function getId(url, userEmail) {",
+									"    pm.sendRequest({",
+									"        url: `${url}/api/get_contacts.php?search=${userEmail}`,",
+									"        method: 'GET'",
+									"    }, (err, res) => {",
+									"        pm.variables.set('id', res.json().data[0].id);",
+									"    }); ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"const checkStatus = statusCode => pm.test(`Status code is ${statusCode}`, () => pm.response.to.have.status(statusCode));",
+									"const checkMessage = (testName, message) => pm.test(testName, () => pm.expect(res.error).to.eql(message));",
+									"",
+									"if (!pm.variables.get('iteration')) {",
+									"    checkStatus(400);",
+									"    checkMessage('Error message about empty id', \"id is empty\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 1) {",
+									"    checkStatus(404);",
+									"    checkMessage('Error message about incorrect id', \"User doesn't exist\");",
+									"    increaseIteration();",
+									"} else if (pm.variables.get('iteration') === 2) {",
+									"    checkStatus(200);",
+									"    pm.test('Message about removing contact', () => pm.expect(res.message).to.eql('Contact has been removed'));",
+									"    pm.variables.unset('iteration');",
+									"    pm.variables.unset('id');",
+									"}",
+									"",
+									"function increaseIteration() {",
+									"    let iteration;",
+									"    if (!pm.variables.get('iteration')) {",
+									"        iteration = 1;",
+									"    } else {",
+									"        iteration = +pm.variables.get('iteration') + 1;",
+									"    }",
+									"    pm.variables.set('iteration', iteration);",
+									"    postman.setNextRequest('Remove contact');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/remove_contact.php?id={{id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"remove_contact.php"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Permission",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(`Status code is 401`, () => pm.response.to.have.status(401));",
+									"pm.test('Error status about unauthorized user', () => pm.expect(pm.response.json().error).to.eql('Authentication failed'));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const url = pm.environment.get('baseUrl');",
+									"pm.sendRequest({",
+									"    url: `${url}/api/logout.php`,",
+									"    method: 'DELETE'",
+									"});   ",
+									"",
+									"pm.variables.set('id', 'ccdd0e46-68f1-11ed-898d-0019d2e2f90a');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/remove_contact.php?id={{id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"remove_contact.php"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"const url = pm.environment.get('baseUrl');",
+							"const email = pm.environment.get('email');",
+							"const password = pm.environment.get('password');",
+							"",
+							"pm.sendRequest({",
+							"    url: `${url}/api/login.php`,",
+							"    method: 'POST',",
+							"    header: 'Content-type: application/json',",
+							"    body: JSON.stringify({email,password})",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
