@@ -1,0 +1,4 @@
+Run tests via terminal:
+1. All tests: npx cypress run --headless
+2. Test for single epic:  npx cypress run --headless --spec '/opt/lampp/htdocs/app/contacts/tests/cypress_tests/cypress/e2e/1.login/*'
+3. Test for single spec:  npx cypress run --headless --spec '/opt/lampp/htdocs/app/contacts/tests/cypress_tests/cypress/e2e/1.login/login.cy.js'

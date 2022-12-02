@@ -1,0 +1,10 @@
+{
+    "addUser": {
+      "name": "Adam CyTest",
+      "email": "adamcytest@test.com"
+    },
+    "editUser": {
+        "name": "Alan CyTest",
+        "email": "alancytest@test.com"
+    }
+}
