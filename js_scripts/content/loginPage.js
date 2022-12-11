@@ -6,8 +6,8 @@ const loginPage = main => {
     main.innerHTML = `
     <form class="login-form">
         <h2>Log in</h2>
-        <label>Email:<input></label>
-        <label>Password:<input type="password" class="input-pwd"><i class="material-icons-outlined">visibility</i></label>
+        <label for="email">Email:<input id="email" aria-required="true"></label>
+        <label for="password">Password:<input type="password" id="password" class="input-pwd" aria-required="true"><i class="material-icons-outlined" role="button" aria-label="show password" tabindex="0">visibility</i></label>
         <button class="btn-primary">Log in</button>
     </form>`;
 

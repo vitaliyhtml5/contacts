@@ -1,7 +1,7 @@
 import {createPage} from './content/createPage.js';
 import {showAlert} from './components/alert.js';
 import {loaderBtn, removeLoaderBtn} from './components/loader.js';
-import {checkEmpty, checkEmailFormat} from './utility/validation.js';
+import {checkEmpty, checkLength, checkEmailFormat} from './utility/validation.js';
 
 const login = e => {
     e.preventDefault();
@@ -10,6 +10,8 @@ const login = e => {
 
     if (!checkEmpty(input[0])
         || !checkEmpty(input[1])
+        || !checkLength(input[0], 30) 
+        || !checkLength(input[1], 30)
         || !checkEmailFormat(input[0])) {
         return;
     } else {

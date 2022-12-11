@@ -7,11 +7,11 @@ import {modal} from '../components/modal.js';
 const userMain = main => {
     main.innerHTML = `
     <div class="tools-wrap">
-        <button class="btn-primary btn-add-item"><span class="material-icons-outlined">add</span>Add word</button>
+        <button class="btn-primary btn-add-item"><span class="material-icons-outlined">add</span>Add contact</button>
         <form class="search">
             <div>
                 <span class="material-icons-outlined">search</span>
-                <input>
+                <input id="search" aria-label="Search by name and category">
                 <button class="material-icons-outlined">close</button>
             </div>
         </form>
@@ -25,10 +25,10 @@ const userMain = main => {
             <thead>
                 <tr>
                     <th>
-                        <button>Name<span class="material-icons-outlined">south</span></button> 
+                        <button aria-label="sorting by name">Name<span class="material-icons-outlined">south</span></button> 
                     </th>
                     <th>
-                        <button>Email<span class="material-icons-outlined">south</span></button> 
+                        <button aria-label="sorting by email">Email<span class="material-icons-outlined">south</span></button> 
                     </th>
                     <th>Actions</th>
                 </tr>        

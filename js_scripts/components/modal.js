@@ -13,7 +13,9 @@ const modal = (content, type) => {
     document.querySelector('.close-modal').onclick = () => closeOverlay();
 
     setTimeout(() => {
-        document.body.onclick = () => closeOverlay(overlay);
+        if (type === 'remove contact') {
+            document.body.onclick = () => closeOverlay(overlay);
+        }
     }, 200);
 
     document.querySelector('.modal-btn-wrap .btn-close').onclick = e => {

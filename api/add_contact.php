@@ -16,7 +16,7 @@ function add_contact($dbc) {
 
     if (!check_missed($data_req, $data_field)
         || !check_empty($data_req, $data_field)
-        || !check_length($data_req, $data_length, 20)
+        || !check_length($data_req, $data_length, 30)
         || !validate_email($data_req['email'])
         || !check_method('POST')
         || !check_category($data_req['category'], $dbc)) {

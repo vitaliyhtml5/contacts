@@ -157,9 +157,9 @@ form label span,
     line-height: 0.5;
 }
 .input-pwd {
-    padding-right: 25px;
+    padding-right: 40px;
 }
-.input-pwd+i {
+.input-pwd~i {
     position: absolute;
     width: 25px;
     height: 25px;
@@ -289,7 +289,7 @@ form label span,
 }
 .dropdown input {
     position: absolute;
-    visibility: hidden;
+    opacity: 0;
 }
 .dropdown span {
     position: relative;
@@ -418,17 +418,17 @@ form label span,
     padding: 0 10px;
     font-size: 16px;
 }
-.page-wrap b {
+.page-wrap button {
     margin-right: 10px;
     padding: 0 8px;
     font-weight: 600;
     cursor: pointer;
     transition: .4s;
 }
-.page-wrap b:hover {
+.page-wrap button:hover {
     color: #2962b3;
 }
-.page-wrap b:last-child {
+.page-wrap button:last-child {
     margin-right: 0;
 }
 .active-page {
@@ -726,6 +726,15 @@ form label span,
 *::-webkit-scrollbar-thumb {
     background: #f0efef;
     border-radius: 4px;
+}
+
+/* Accessibility */
+button:focus {
+    outline: 1px solid #2d2d2d;
+}
+i[role="button"]:focus,
+label:focus {
+    outline: 1px solid #9a9a9a;
 }
 
 /* Media queries */

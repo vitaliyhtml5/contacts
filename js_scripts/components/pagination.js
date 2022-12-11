@@ -15,7 +15,7 @@ const createPagination = (pagination, total, pageSize, loadData) => {
     } else {
         const chosenPage = document.querySelector('.active-page');
         
-        const pageArr = buildPages(document.querySelectorAll('.page-wrap b')[0].textContent);
+        const pageArr = buildPages(document.querySelectorAll('.page-wrap button')[0].textContent);
         const pageIndex = Array.from(chosenPage.parentElement.children).indexOf(chosenPage);
 
         document.querySelector('.page-change').classList.remove('page-change');
@@ -40,16 +40,16 @@ const createPagination = (pagination, total, pageSize, loadData) => {
         for (let i = 1; i <= Math.ceil(total/pageSize); i++) {
             if (i === 4 && total > 5*pageSize && pageArr[3] <= Math.ceil(total/pageSize)-2) {
                 pageWrap.innerHTML += `
-                <b>${pageArr[i-1]}</b><span>...</span><b class="total">${Math.ceil(total/pageSize)}</b>`;
+                <button aria-label="page ${pageArr[i-1]}">${pageArr[i-1]}</button><span>...</span><button class="total" aria-label="${Math.ceil(total/pageSize)}">${Math.ceil(total/pageSize)}</button>`;
                 pageBtn.forEach(el => el.style.display = 'block');                
                 break;
             } else if (pageArr[i-1] !== undefined) {
-                pageWrap.innerHTML += `<b>${pageArr[i-1]}</b>`;
+                pageWrap.innerHTML += `<button aria-label="page ${pageArr[i-1]}">${pageArr[i-1]}</button>`;
             }
         }
         
-        if (activeTotal) document.querySelector('.page-wrap b:last-child').classList.add('active-page');
-        else document.querySelectorAll('.page-wrap b')[pageIndex].classList.add('active-page');
+        if (activeTotal) document.querySelector('.page-wrap button:last-child').classList.add('active-page');
+        else document.querySelectorAll('.page-wrap button')[pageIndex].classList.add('active-page');
 
         setPageArrow(pageArr, Math.ceil(total/pageSize));
 
@@ -66,7 +66,7 @@ const createPagination = (pagination, total, pageSize, loadData) => {
 
     //Change pages by clicking on numbers
     function changePages() {
-        document.querySelectorAll('.page-wrap b:not(.active-page)').forEach(el => {
+        document.querySelectorAll('.page-wrap button:not(.active-page)').forEach(el => {
             el.onclick = () => {
                 document.querySelector('.active-page').classList.remove('active-page');
                 document.querySelector('.page-wrap').classList.add('page-change');
@@ -98,8 +98,8 @@ const createPagination = (pagination, total, pageSize, loadData) => {
     }
 
     pageBtn[0].onclick = () => {
-        const firstPage = +document.querySelectorAll('.page-wrap b')[0].textContent;
-        const pageArr = document.querySelectorAll('.page-wrap b');
+        const firstPage = +document.querySelectorAll('.page-wrap button')[0].textContent;
+        const pageArr = document.querySelectorAll('.page-wrap button');
         const total = +pageArr[pageArr.length - 1].textContent;
         let pageGap;
 
@@ -122,7 +122,7 @@ const createPagination = (pagination, total, pageSize, loadData) => {
     function setPageState() {
         document.querySelector('.active-page').classList.remove('active-page');
         document.querySelector('.page-wrap').classList.add('page-change');
-        document.querySelectorAll('.page-wrap b')[0].classList.add('active-page');
+        document.querySelectorAll('.page-wrap button')[0].classList.add('active-page');
     }
 }
 

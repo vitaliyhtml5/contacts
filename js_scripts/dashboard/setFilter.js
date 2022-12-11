@@ -16,8 +16,8 @@ const setFilter = (dropdown, applyFilter) => {
     function fillCategorories() {
         for (let i = 0; i < categories.length; i++) {
             document.querySelector('.dropdown-list').innerHTML += `
-            <label>
-                <input type="checkbox">
+            <label for="${categories[i]}">
+                <input type="checkbox" id="${categories[i]}">
                 <span>${categories[i]}</span>
             </label>`;
         }

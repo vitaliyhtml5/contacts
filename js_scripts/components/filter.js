@@ -83,7 +83,7 @@ const filter = updateData => {
         if (e.key === 'Escape') closeDropdown();
     });
 
-    return filterData;
+    return filterData.toLocaleLowerCase();
 }
 
 export {filter};

@@ -5,7 +5,7 @@ const showAlert = (text, type = 'success') => {
     
     alert.innerHTML = `
     <span class="material-icons-outlined">tungsten</span>
-    <p>${text}</p>
+    <p role="alert">${text}</p>
     <button class="material-icons-outlined">close</button>`;
 
     if (type === 'err') alert.classList.add('alert-err');

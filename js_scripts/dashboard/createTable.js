@@ -4,16 +4,19 @@ import {removeContact} from './removeContact.js';
 import {setPagination} from '../components/pagination.js';
 
 const createTable = (container, data) => {
+    const mainTable = document.querySelector('.main-table');
     container.scrollTo(0, 0);
     container.innerHTML = ``;
 
     if (data.data === 'No results found') {
-        document.querySelector('.main-table').classList.add('no-results-block');
+        mainTable.classList.add('no-results-block');
+        mainTable.setAttribute('aria-label', 'No results found');
         document.querySelector('.pagination').style.display = 'none';
         return;
     }
     else {
-        document.querySelector('.main-table').classList.remove('no-results-block');
+        mainTable.classList.remove('aria-label');
+        mainTable.removeAttribute('aria-label');
         createData();
         setPagination(data.meta.total, 10, getData);
     }
@@ -26,8 +29,8 @@ const createTable = (container, data) => {
                 <td>${data.data[i].email}</td>
                 <td>
                     <div class="table-btn-wrap">
-                        <button class="edit-table"><span class="material-icons-outlined">edit</span>Edit</button>
-                        <button class="remove-table"><span class="material-icons-outlined">delete</span>Remove</button>
+                        <button class="edit-table" aria-label="Edit ${data.data[i].name}"><span class="material-icons-outlined">edit</span>Edit</button>
+                        <button class="remove-table" aria-label="Remove ${data.data[i].name}"><span class="material-icons-outlined">delete</span>Remove</button>
                     </div>
                 </td>
             </tr>`;

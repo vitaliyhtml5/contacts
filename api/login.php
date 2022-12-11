@@ -11,7 +11,7 @@ $data_field = ['email', 'password'];
 
 if (!check_missed($data_req, $data_field)
     || !check_empty($data_req, $data_field)
-    || !check_length($data_req, $data_field, 20)
+    || !check_length($data_req, $data_field, 30)
     || !validate_email($data_req['email'])
     || !check_method('POST')
     || !check_creds($data_req, $dbc)) {
