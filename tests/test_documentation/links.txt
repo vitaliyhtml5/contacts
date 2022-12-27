@@ -1,0 +1,11 @@
+1. Test plan: https://docs.google.com/document/d/11NY6Fb4A_mbdMOqMy7pi5rgWy5R9CBoWTaiyXJnW2ws/edit?usp=share_link
+
+2. General checklist: https://docs.google.com/spreadsheets/d/1qWBZOt5yobcV1Z6tWBKgQdFl1P4_2Xsi_kXKlUvCeeM/edit?usp=share_link
+
+3. Compatibility checklist: https://docs.google.com/spreadsheets/d/1NzHAh4Jt6BBt6LpZPzwqvB3Rc5hRfpXlbamyg3SnMv4/edit?usp=share_link
+
+4. All test cases in TestRail: https://drive.google.com/file/d/1JFq8gWmbJ7-C_hb3vuPWYpFBSVuunKFG/view?usp=share_link
+
+5. Test Case (example): https://docs.google.com/document/d/1LIsvvnPNCn-DbBOg-fQmwxAY1z45zq26_LVAm8GC5xU/edit?usp=share_link
+
+6. Bug report (example): https://docs.google.com/document/d/1ijwKswNsOLzLB5w1T-pEvU1FhE5hXrX88It51wVezmU/edit?usp=share_link

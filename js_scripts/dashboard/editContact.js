@@ -9,7 +9,7 @@ import {checkEmpty, checkLength, checkEmailFormat} from '../utility/validation.j
 
 const editContact = data => {
     modal(userModal, 'add contact');
-    const input = document.querySelectorAll('label input');
+    const input = document.querySelectorAll('.form-menu-expanded label input');
     input[0].value = data.name;
     input[1].value = data.email;
     document.querySelector('.modal h2').textContent = 'Edit contact';
