@@ -15,6 +15,7 @@ const createTable = (container, data) => {
         return;
     }
     else {
+        mainTable.classList.remove('no-results-block');
         mainTable.classList.remove('aria-label');
         mainTable.removeAttribute('aria-label');
         createData();

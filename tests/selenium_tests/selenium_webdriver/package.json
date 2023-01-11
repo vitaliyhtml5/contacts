@@ -1,0 +1,23 @@
+{
+  "name": "selenium_tests",
+  "version": "1.0.0",
+  "description": "selenium tests for contacts app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "selenium",
+    "contacts",
+    "tests"
+  ],
+  "author": "Vitalii",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.3.7",
+    "chromedriver": "^108.0.0",
+    "mocha": "^10.2.0",
+    "request": "^2.88.2",
+    "selenium-webdriver": "^4.7.1"
+  }
+}
